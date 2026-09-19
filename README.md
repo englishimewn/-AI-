@@ -11,6 +11,12 @@ GitHub 仓库名为 `model-agnostic-coding`（仓库改名后的新地址），�
 把"规划模型负责需求、架构与验收，实现模型负责改代码与修测试，再由规划模型审查"的
 角色分工，打包成一个可复用、可开源的 Codex 插件。
 
+这套分工同时是成本优化策略：把高能力（通常也更高成本）的模型用在需求、架构、验收与
+审查这些决定正确性、调用次数少的环节，把编码与测试修复这类迭代量大、单价更敏感的
+环节交给成本更低的实现模型，以减少整体模型调用成本。这是设计目标，不是承诺——本插件
+不保证具体节省比例，实际取决于 token、上下文、重试与 provider 价格，详见
+[成本模型与限制](#成本模型与限制)。
+
 这个定位不绑定任何具体模型、版本或供应商：插件描述的是**角色**与**责任边界**，
 而不是某个模型的名字。当前实现中，主代理由 OpenAI/GPT 系模型承担，实现 worker 由
 DeepSeek V4.1 Flash 承担；换成其他模型组合时，工作流与边界保持不变。
@@ -41,6 +47,31 @@ DeepSeek V4.1 Flash 承担；换成其他模型组合时，工作流与边界保
 
 未承诺的能力：本版本**没有**自动模型路由、没有多 provider 调度、没有成本或评测记录。
 上述流程由主代理按规则执行，不存在自动择优或自动切换。
+
+## 成本模型与限制
+
+成本优化来自角色分工，而不是绑定某个模型或价格：
+
+- 高能力/高成本模型只做需求分析、架构设计、验收标准与最终审查——这些环节数量少，
+  但决定结果正确性，值得用更强的模型。
+- 成本更低的实现模型承担编码与测试修复——这类工作迭代次数多、累计 token 可观，
+  适合用单价更低的模型完成。
+- 主代理不写应用代码，也不把 worker 的自述当作通过证据；实现循环的成本落在 worker
+  侧，审查与验收仍由主代理把关。
+
+限制（如实说明）：
+
+- 本插件不承诺任何具体节省比例。实际节省取决于任务规模、token 用量、上下文长度、
+  重试与返工次数，以及规划模型与实现模型各自的 provider 价格。
+- 实现模型单价更低，并不等于总成本一定更低：如果任务拆分不当、上下文过长或反复返工，
+  总成本可能反而上升。
+- 当前版本**未采集**任何成本或用量数据：不记录 token、费用、调用次数或返工次数，
+  因此本仓库里没有可引用的实测节省数字或基准。
+- 角色与模型是分开的：任意"规划 + 实现 + 审查"的模型组合都能套用这套分工，成本特征
+  取决于所选模型与 provider，而不是本插件本身。
+
+成本与用量记录属于[未来扩展方向](#未来扩展方向)中的规划内容；在落地之前，本文档不会
+声称已经支持成本追踪或给出节省数据。
 
 ## 快速入口
 
@@ -316,7 +347,7 @@ scripts/package-plugin.sh --out /tmp/dual-model-coding.tar.gz
 
 - 版本号遵循语义化版本，`plugin.json` 的 `version` 必须与 `CHANGELOG.md` 最新条目一致。
 - 发布流程：更新 `CHANGELOG.md` → 同步 `plugin.json` 的 `version` → 跑校验与打包 →
-  提交并打 tag（例如 `git tag -a v0.1.4 -m "dual-model-coding 0.1.4"`）→ 推送 tag →
+  提交并打 tag（例如 `git tag -a v0.1.5 -m "dual-model-coding 0.1.5"`）→ 推送 tag →
   把归档附到 release。
 - 本地迭代时不要靠递增版本号触发重装，改用官方 `plugin-creator` 技能的
   `update_plugin_cachebuster.py` 生成 `+codex.<cachebuster>` 后缀，再重装并在新会话验证。
@@ -334,6 +365,13 @@ requirements, architecture, acceptance criteria, and review, while an implementa
 writes scoped code changes and iterates on focused tests. The contract is defined over roles and
 responsibility boundaries, not over model names or versions.
 
+The same split is the cost strategy: keep the high-capability (and typically higher-cost) model
+on the few, correctness-deciding steps — requirement analysis, architecture, acceptance criteria,
+and review — and route the high-iteration coding and test-fix work to a lower-cost implementation
+model, to reduce overall model call cost. This is a design goal, not a guarantee: no specific
+savings percentage is promised, and actual savings depend on tokens, context, retries, and
+provider prices. See "Cost model and limitations" below.
+
 What this version ships today: the primary agent runs on an OpenAI/GPT model and the
 implementation worker runs on DeepSeek V4.1 Flash through `scripts/codex-deepseek-worker`. That
 is the only supported combination in this release. There is no automatic model routing, no
@@ -342,6 +380,26 @@ multi-provider scheduling, and no cost or evaluation tracking.
 Roadmap directions (not yet implemented): configurable models and providers, per-role
 configuration for planning, implementation, and review, explicit routing policies, and
 evaluation plus cost records for comparing model combinations.
+
+**Cost model and limitations**
+
+- The higher-capability, higher-cost model handles requirement analysis, architecture, acceptance
+  criteria, and final review: few calls, but they decide correctness.
+- The lower-cost implementation worker owns coding and test-fix iterations: the high-volume work
+  where cheaper tokens matter most.
+- The primary model never writes application code and never treats the worker's self-report as
+  proof, so the implementation loop runs on the worker while review stays with the primary model.
+- No specific savings percentage is promised. Actual savings depend on task size, token usage,
+  context length, retries and rework, and the provider prices of both the planning and
+  implementation models.
+- A cheaper implementation model does not guarantee a lower total cost: poor task decomposition,
+  oversized context, or repeated rework can raise it.
+- This release collects no cost or usage data — no token, spend, call-count, or rework tracking —
+  so there are no measured savings figures to cite.
+- Roles are separate from models, so any planning + implementation + review combination can use
+  this split; the cost profile follows the chosen models and provider, not this plugin.
+
+Cost and usage records remain a roadmap item, not a shipped feature.
 
 - Install the plugin with `codex plugin add dual-model-coding@personal`; install the launcher with
   `install -m 0755 scripts/codex-deepseek-worker ~/.local/bin/codex-deepseek-worker`.

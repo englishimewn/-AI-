@@ -3,6 +3,28 @@
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 的结构，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.1.5] - 2026-09-19
+
+### 变更
+
+- `README.md` 中英文都补充成本优化定位：高能力/高成本模型负责需求、架构、验收与审查，
+  成本更低的实现模型负责编码与测试修复，以减少整体模型调用成本；这是设计目标，
+  不承诺具体节省比例。
+- `README.md` 新增“成本模型与限制”一节（英文小节新增 “Cost model and limitations”）：
+  说明成本优化来自角色分工，并列明限制——实际节省取决于 token、上下文、重试与
+  provider 价格，当前版本未采集任何成本或用量数据，也没有可引用的实测节省数字。
+- `.codex-plugin/plugin.json` 的 `description`、`interface.shortDescription` 与
+  `interface.longDescription` 体现成本优化分工，同时保持模型无关与诚实：不写未测量的
+  百分比，说明当前不采集成本数据，并明确角色与模型分离、可替换任意模型/provider。
+- `plugin.json` 版本号提升到 `0.1.5`。
+
+### 说明
+
+- 本次只改动文档与清单，`scripts/`、`skills/`、CI 工作流、许可证与安全策略未变。
+- 当前实现事实保持准确：OpenAI/GPT 系主代理负责需求/架构/验收/审查，DeepSeek V4.1 Flash
+  worker 负责实现与测试修复；成本节省只是设计目标，未经测量、不做保证。
+- 仓库、README 与变更记录中都不含密钥、token 或机器私有路径。
+
 ## [0.1.4] - 2026-09-19
 
 ### 变更

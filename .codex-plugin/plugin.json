@@ -1,7 +1,7 @@
 {
   "name": "dual-model-coding",
-  "version": "0.1.4",
-  "description": "Model-agnostic coding workflow for Codex: a planning model owns requirements, architecture, acceptance criteria, and review, while an implementation worker writes scoped code changes and iterates on focused tests. This release ships the OpenAI/GPT primary agent with a DeepSeek V4.1 Flash worker.",
+  "version": "0.1.5",
+  "description": "Model-agnostic coding workflow for Codex: a planning model owns requirements, architecture, acceptance criteria, and review, while an implementation worker writes scoped code changes and iterates on focused tests. The split keeps the higher-capability, higher-cost model on planning and review while a lower-cost worker handles coding and test-fix iterations, to reduce overall model call cost; no savings percentage is guaranteed and this release tracks no cost data. This release ships the OpenAI/GPT primary agent with a DeepSeek V4.1 Flash worker.",
   "author": {
     "name": "dual-model-coding contributors"
   },
@@ -20,8 +20,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Dual Model Coding",
-    "shortDescription": "Planning model plans and reviews; an implementation worker writes the code.",
-    "longDescription": "Packages a model-agnostic coding workflow over roles rather than model names: a planning model owns requirement analysis, architecture, task decomposition, acceptance criteria, risk decisions, and final review, while an implementation worker performs scoped implementation and test-fix iterations. In this release the primary agent runs on an OpenAI/GPT model and the worker runs on DeepSeek V4.1 Flash through the local codex-deepseek-worker launcher; future versions aim to support configurable models and providers, per-role configuration, routing policies, and evaluation and cost records, none of which are implemented yet. One write-capable worker at a time owns overlapping files. The plugin keeps API keys out of prompts, logs, and the repository, sends no code anywhere except the configured model provider, and stops with explicit setup instructions when the worker or its credential is unavailable.",
+    "shortDescription": "Planning model plans and reviews; a lower-cost worker writes the code.",
+    "longDescription": "Packages a model-agnostic coding workflow over roles rather than model names: a planning model owns requirement analysis, architecture, task decomposition, acceptance criteria, risk decisions, and final review, while an implementation worker performs scoped implementation and test-fix iterations. The division of labor is also the cost strategy: the higher-capability, higher-cost model stays on the few correctness-deciding steps while the lower-cost worker takes the high-iteration coding and test-fix work, aiming to reduce overall model call cost. No specific savings percentage is guaranteed, and this release collects no cost or usage data; actual savings depend on task size, tokens, context, retries and rework, and provider prices. In this release the primary agent runs on an OpenAI/GPT model and the worker runs on DeepSeek V4.1 Flash through the local codex-deepseek-worker launcher; future versions aim to support configurable models and providers, per-role configuration, routing policies, and evaluation and cost records, none of which are implemented yet. Roles stay separate from model names, so other model or provider combinations can reuse the same split. One write-capable worker at a time owns overlapping files. The plugin keeps API keys out of prompts, logs, and the repository, sends no code anywhere except the configured model provider, and stops with explicit setup instructions when the worker or its credential is unavailable.",
     "developerName": "dual-model-coding contributors",
     "category": "Productivity",
     "capabilities": [
