@@ -18,8 +18,6 @@ jobs:
   validate:
     name: validate plugin (ubuntu-latest)
     runs-on: ubuntu-latest
-    env:
-      CODEX_HOME: ${{ runner.temp }}/codex-home
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,6 +29,13 @@ jobs:
 
       - name: Install PyYAML (official validators import yaml)
         run: python3 -m pip install --disable-pip-version-check pyyaml
+
+      - name: Provision CODEX_HOME
+        run: |
+          set -euo pipefail
+          codex_home="${RUNNER_TEMP}/codex-home"
+          mkdir -p "${codex_home}/skills/.system"
+          printf 'CODEX_HOME=%s\n' "${codex_home}" >> "${GITHUB_ENV}"
 
       - name: Provision official Codex system skills
         run: |
