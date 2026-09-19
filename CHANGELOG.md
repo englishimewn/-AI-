@@ -3,6 +3,31 @@
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 的结构，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.1.4] - 2026-09-19
+
+### 变更
+
+- 同步仓库改名后的 canonical URL：`README.md` 顶部 canonical 地址与 CI `validate` 徽章/链接、
+  `git remote add origin` 示例、README 顶部徽章示例、英文小节，以及
+  `.codex-plugin/plugin.json` 的 `repository` 与 `homepage`，全部指向新地址
+  `https://github.com/englishimewn/model-agnostic-coding`。
+- 插件内部 `name` 保持 `dual-model-coding`，技能目录名与安装命令
+  （`codex plugin add dual-model-coding@personal` 等）都不变：本次只更换仓库地址，
+  不改变插件标识与安装方式。
+- `README.md` 顶部补充一句说明：GitHub 仓库名是 `model-agnostic-coding`，插件名与安装命令
+  仍是 `dual-model-coding`，避免读者把仓库名与插件名混淆。
+- `README.md` 版本发布示例的 tag 从 `v0.1.2` 更新为 `v0.1.4`，与本次版本号一致。
+- `CHANGELOG.md` 中 0.1.2 条目对旧仓库地址的历史描述改为不绑定具体地址的表述，
+  避免文档里残留已失效的旧 URL。
+- `plugin.json` 版本号提升到 `0.1.4`。
+
+### 说明
+
+- 本次只改动文档与清单，`scripts/`、`skills/`、CI 工作流、许可证与安全策略未变。
+- 模型无关定位与当前实现说明保持不变：主代理负责需求/架构/验收/审查，DeepSeek V4.1 Flash
+  worker 负责实现与测试修复。
+- 仓库、README 与变更记录中都不含密钥、token 或机器私有路径。
+
 ## [0.1.3] - 2026-09-19
 
 ### 变更
@@ -35,9 +60,9 @@
 
 ### 新增
 
-- 在 `.codex-plugin/plugin.json` 中补充 `repository` 与 `homepage`，两者都指向 canonical
-  仓库 `https://github.com/englishimewn/-AI-`；字段属于官方 plugin schema 允许的键，
-  并且是绝对 `https://` 地址。
+- 在 `.codex-plugin/plugin.json` 中补充 `repository` 与 `homepage`，两者都指向当时的 canonical
+  仓库地址（该地址已在 0.1.4 中随仓库改名同步为新地址）；字段属于官方 plugin schema 允许的
+  键，并且是绝对 `https://` 地址。
 - `README.md` 顶部加入 canonical 仓库地址、CI `validate` 徽章与“快速入口”表格，
   把安装、验证、打包/发布与变更记录的入口集中到一处。
 - `README.md` 新增“仓库发布说明”：记录推送 remote、改名/迁移时的同步点，以及

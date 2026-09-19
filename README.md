@@ -1,9 +1,12 @@
 # dual-model-coding
 
-[![validate](https://github.com/englishimewn/-AI-/actions/workflows/validate.yml/badge.svg)](https://github.com/englishimewn/-AI-/actions/workflows/validate.yml)
+[![validate](https://github.com/englishimewn/model-agnostic-coding/actions/workflows/validate.yml/badge.svg)](https://github.com/englishimewn/model-agnostic-coding/actions/workflows/validate.yml)
 
-**仓库地址（canonical）：<https://github.com/englishimewn/-AI->** ｜
+**仓库地址（canonical）：<https://github.com/englishimewn/model-agnostic-coding>** ｜
 许可证 MIT ｜ 版本与变更见 [CHANGELOG.md](./CHANGELOG.md)
+
+GitHub 仓库名为 `model-agnostic-coding`（仓库改名后的新地址），插件名与安装命令仍是
+`dual-model-coding`，两者不一致是有意为之。
 
 把"规划模型负责需求、架构与验收，实现模型负责改代码与修测试，再由规划模型审查"的
 角色分工，打包成一个可复用、可开源的 Codex 插件。
@@ -285,7 +288,7 @@ scripts/package-plugin.sh --out /tmp/dual-model-coding.tar.gz
 
 ## 开源发布到 GitHub
 
-本插件的 canonical 仓库是 <https://github.com/englishimewn/-AI->；`plugin.json` 的
+本插件的 canonical 仓库是 <https://github.com/englishimewn/model-agnostic-coding>；`plugin.json` 的
 `repository` 与 `homepage` 已指向该地址，CI 徽章也已放在 README 顶部。
 
 1. 确认工作树干净，且 `plugin.json` 的 `version` 与 `CHANGELOG.md` 最新条目一致。
@@ -293,7 +296,7 @@ scripts/package-plugin.sh --out /tmp/dual-model-coding.tar.gz
 3. 加入远程并推送（仓库已存在时只需 `git push`）：
 
    ```bash
-   git remote add origin https://github.com/englishimewn/-AI-.git
+   git remote add origin https://github.com/englishimewn/model-agnostic-coding.git
    git branch -M main
    git push -u origin main
    ```
@@ -304,7 +307,7 @@ scripts/package-plugin.sh --out /tmp/dual-model-coding.tar.gz
 5. README 顶部徽章指向本仓库的 `validate` 工作流，无需再手工替换：
 
    ```markdown
-   ![validate](https://github.com/englishimewn/-AI-/actions/workflows/validate.yml/badge.svg)
+   ![validate](https://github.com/englishimewn/model-agnostic-coding/actions/workflows/validate.yml/badge.svg)
    ```
 
 6. 需要对外分发时，把 `scripts/package-plugin.sh` 生成的 `tar.gz` 作为 release 附件上传。
@@ -313,7 +316,7 @@ scripts/package-plugin.sh --out /tmp/dual-model-coding.tar.gz
 
 - 版本号遵循语义化版本，`plugin.json` 的 `version` 必须与 `CHANGELOG.md` 最新条目一致。
 - 发布流程：更新 `CHANGELOG.md` → 同步 `plugin.json` 的 `version` → 跑校验与打包 →
-  提交并打 tag（例如 `git tag -a v0.1.2 -m "dual-model-coding 0.1.2"`）→ 推送 tag →
+  提交并打 tag（例如 `git tag -a v0.1.4 -m "dual-model-coding 0.1.4"`）→ 推送 tag →
   把归档附到 release。
 - 本地迭代时不要靠递增版本号触发重装，改用官方 `plugin-creator` 技能的
   `update_plugin_cachebuster.py` 生成 `+codex.<cachebuster>` 后缀，再重装并在新会话验证。
@@ -324,7 +327,7 @@ MIT，见 [LICENSE](./LICENSE)。变更记录见 [CHANGELOG.md](./CHANGELOG.md)�
 
 ## English
 
-Canonical repository: <https://github.com/englishimewn/-AI->.
+Canonical repository: <https://github.com/englishimewn/model-agnostic-coding>.
 
 `dual-model-coding` packages a model-agnostic split for Codex: a planning model owns
 requirements, architecture, acceptance criteria, and review, while an implementation worker

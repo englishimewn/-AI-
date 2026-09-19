@@ -1,13 +1,13 @@
 {
   "name": "dual-model-coding",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Model-agnostic coding workflow for Codex: a planning model owns requirements, architecture, acceptance criteria, and review, while an implementation worker writes scoped code changes and iterates on focused tests. This release ships the OpenAI/GPT primary agent with a DeepSeek V4.1 Flash worker.",
   "author": {
     "name": "dual-model-coding contributors"
   },
   "license": "MIT",
-  "repository": "https://github.com/englishimewn/-AI-",
-  "homepage": "https://github.com/englishimewn/-AI-",
+  "repository": "https://github.com/englishimewn/model-agnostic-coding",
+  "homepage": "https://github.com/englishimewn/model-agnostic-coding",
   "keywords": [
     "codex",
     "plugin",
