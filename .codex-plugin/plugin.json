@@ -1,7 +1,7 @@
 {
   "name": "dual-model-coding",
-  "version": "0.1.2",
-  "description": "Two-model coding workflow for Codex: the primary OpenAI model owns requirements, architecture, acceptance criteria, and review, while a DeepSeek V4.1 Flash worker implements scoped code changes and focused test fixes locally.",
+  "version": "0.1.3",
+  "description": "Model-agnostic coding workflow for Codex: a planning model owns requirements, architecture, acceptance criteria, and review, while an implementation worker writes scoped code changes and iterates on focused tests. This release ships the OpenAI/GPT primary agent with a DeepSeek V4.1 Flash worker.",
   "author": {
     "name": "dual-model-coding contributors"
   },
@@ -20,8 +20,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Dual Model Coding",
-    "shortDescription": "Primary model plans and reviews; DeepSeek worker implements.",
-    "longDescription": "Packages a two-model coding workflow: the primary OpenAI model owns requirement analysis, architecture, task decomposition, acceptance criteria, risk decisions, and final review, while DeepSeek V4.1 Flash performs scoped implementation and test-fix iterations through the local codex-deepseek-worker launcher. One write-capable worker at a time owns overlapping files. The plugin keeps API keys out of prompts, logs, and the repository, sends no code anywhere except the configured model provider, and stops with explicit setup instructions when the worker or its credential is unavailable.",
+    "shortDescription": "Planning model plans and reviews; an implementation worker writes the code.",
+    "longDescription": "Packages a model-agnostic coding workflow over roles rather than model names: a planning model owns requirement analysis, architecture, task decomposition, acceptance criteria, risk decisions, and final review, while an implementation worker performs scoped implementation and test-fix iterations. In this release the primary agent runs on an OpenAI/GPT model and the worker runs on DeepSeek V4.1 Flash through the local codex-deepseek-worker launcher; future versions aim to support configurable models and providers, per-role configuration, routing policies, and evaluation and cost records, none of which are implemented yet. One write-capable worker at a time owns overlapping files. The plugin keeps API keys out of prompts, logs, and the repository, sends no code anywhere except the configured model provider, and stops with explicit setup instructions when the worker or its credential is unavailable.",
     "developerName": "dual-model-coding contributors",
     "category": "Productivity",
     "capabilities": [
@@ -31,7 +31,7 @@
     ],
     "defaultPrompt": [
       "Split this task: primary model plans, worker implements.",
-      "Delegate this scoped change to codex-deepseek-worker.",
+      "Delegate this scoped change to the implementation worker.",
       "Review the worker diff and test results before merging."
     ]
   }

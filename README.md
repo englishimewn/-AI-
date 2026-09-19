@@ -5,12 +5,39 @@
 **仓库地址（canonical）：<https://github.com/englishimewn/-AI->** ｜
 许可证 MIT ｜ 版本与变更见 [CHANGELOG.md](./CHANGELOG.md)
 
-把"主模型负责需求、架构与验收，DeepSeek V4.1 Flash 负责实现与测试修复"的协作方法，
-打包成一个可复用、可开源的 Codex 插件。
+把"规划模型负责需求、架构与验收，实现模型负责改代码与修测试，再由规划模型审查"的
+角色分工，打包成一个可复用、可开源的 Codex 插件。
 
-本项目把两种模型的分工固定下来：GPT-6 / OpenAI 主代理负责需求分析、架构设计、
-验收标准与最终审查，不写应用代码；实现循环（写代码、跑测试、修测试）交给一个独立的
-DeepSeek V4.1 Flash worker 进程完成。
+这个定位不绑定任何具体模型、版本或供应商：插件描述的是**角色**与**责任边界**，
+而不是某个模型的名字。当前实现中，主代理由 OpenAI/GPT 系模型承担，实现 worker 由
+DeepSeek V4.1 Flash 承担；换成其他模型组合时，工作流与边界保持不变。
+
+## 定位：模型无关
+
+- **角色优先**：契约写在角色上——规划/架构/验收/审查，与实现/测试修复——而不是写在
+  模型名上。模型可以替换，职责、任务包格式与验收流程不变。
+- **当前实现**：本版本仍在 OpenAI/GPT 系主代理下运行，并调用 DeepSeek V4.1 Flash
+  作为实现 worker；这是当前唯一的、可用的组合。
+- **未来扩展**：为任意"规划 + 实现 + 审查"模型组合留出空间，见
+  [未来扩展方向](#未来扩展方向)。这些是方向，不是当前已交付的功能。
+
+## 当前能力
+
+本版本已经实现并可直接使用的能力：
+
+| 能力 | 现状 |
+| --- | --- |
+| 角色分工契约 | 主代理负责需求、架构、任务拆分、验收标准与最终审查，不写应用代码 |
+| 实现 worker | 由 `scripts/codex-deepseek-worker` 以固定 provider/model 拉起 DeepSeek V4.1 Flash，只改任务包允许的文件 |
+| 任务包 | `scripts/create-task-packet.sh` 生成自包含任务包（目标、范围、约束、验收、验证命令） |
+| 单写者约束 | 一个可写 worker 同一时间只负责互不重叠的文件；并行 worker 必须文件所有权互斥 |
+| 审查回路 | 主代理检查 diff 与测试摘要，把具体修正意见发回 worker，不采信 worker 的自述结论 |
+| 密钥边界 | 密钥只留在本机凭据文件；任务包、prompt、日志与提交中都不出现 |
+| 本地校验 | `scripts/validate-plugin.sh` 与 `scripts/run-official-validators.sh`，不发网络请求 |
+| 打包与 CI | `scripts/package-plugin.sh` 先校验后打包；CI 在 push/PR 上跑同一套检查 |
+
+未承诺的能力：本版本**没有**自动模型路由、没有多 provider 调度、没有成本或评测记录。
+上述流程由主代理按规则执行，不存在自动择优或自动切换。
 
 ## 快速入口
 
@@ -36,6 +63,20 @@ DeepSeek V4.1 Flash worker 进程完成。
 | `scripts/package-plugin.sh` | 校验通过后打包 `tar.gz`，拒绝覆盖已有文件 |
 | `.github/workflows/validate.yml` | CI：push/PR 时跑官方校验、`bash -n` 与本地自检 |
 | `CONTRIBUTING.md` / `SECURITY.md` | 贡献流程、安全策略与漏洞报告 |
+
+## 未来扩展方向
+
+以下方向与当前角色契约兼容，属于规划内容，尚未实现；实现前不会改变本文档对
+"当前能力"的描述。
+
+| 方向 | 设想 | 现状 |
+| --- | --- | --- |
+| 可选模型 / provider | 实现 worker 的 provider、模型、CLI 启动方式可配置，不写死在启动器里 | 当前固定为 DeepSeek V4.1 Flash |
+| 角色配置 | 规划、实现、审查三类角色可各自指定模型与参数，并允许审查角色独立于规划角色 | 当前规划与审查由同一主代理承担 |
+| 路由策略 | 由显式策略（或规则文件）决定任务交给哪个模型，策略可审查、可复现 | 当前由主代理按规则人工判断，无自动路由 |
+| 评测与成本记录 | 记录每次委派的模型、token/费用、测试结果与返工次数，用于横向比较模型组合 | 当前不采集、不落盘任何用量数据 |
+
+这些方向只在文档中作为演进目标存在；在落地之前，README 与清单都不会声称已经支持。
 
 ## 前置条件
 
@@ -166,6 +207,10 @@ scripts/create-task-packet.sh --template
 - 一个可写 worker 同一时间只负责彼此重叠的文件；并行 worker 必须文件所有权互斥。
 - 不写机器私有路径、不自动上传代码、不发起与任务无关的网络请求。
 
+角色与模型是分开的：上面这些边界描述的是职责，不是某个具体模型。
+当前版本中，主代理是 OpenAI/GPT 系模型，实现 worker 是 DeepSeek V4.1 Flash；
+替换模型不会改变这些边界。
+
 ## 故障排查
 
 **未检测到 `DEEPSEEK_API_KEY`**
@@ -281,9 +326,19 @@ MIT，见 [LICENSE](./LICENSE)。变更记录见 [CHANGELOG.md](./CHANGELOG.md)�
 
 Canonical repository: <https://github.com/englishimewn/-AI->.
 
-`dual-model-coding` packages a two-model split for Codex: the GPT-6 / OpenAI primary agent owns
-requirements, architecture, acceptance criteria, and review, while the DeepSeek V4.1 Flash
-implementation worker writes scoped code changes through `scripts/codex-deepseek-worker`.
+`dual-model-coding` packages a model-agnostic split for Codex: a planning model owns
+requirements, architecture, acceptance criteria, and review, while an implementation worker
+writes scoped code changes and iterates on focused tests. The contract is defined over roles and
+responsibility boundaries, not over model names or versions.
+
+What this version ships today: the primary agent runs on an OpenAI/GPT model and the
+implementation worker runs on DeepSeek V4.1 Flash through `scripts/codex-deepseek-worker`. That
+is the only supported combination in this release. There is no automatic model routing, no
+multi-provider scheduling, and no cost or evaluation tracking.
+
+Roadmap directions (not yet implemented): configurable models and providers, per-role
+configuration for planning, implementation, and review, explicit routing policies, and
+evaluation plus cost records for comparing model combinations.
 
 - Install the plugin with `codex plugin add dual-model-coding@personal`; install the launcher with
   `install -m 0755 scripts/codex-deepseek-worker ~/.local/bin/codex-deepseek-worker`.

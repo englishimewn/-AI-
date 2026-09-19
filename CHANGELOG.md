@@ -3,6 +3,34 @@
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 的结构，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.1.3] - 2026-09-19
+
+### 变更
+
+- `README.md` 改为模型无关定位：把契约写在角色（规划/架构/验收/审查与实现/测试修复）
+  而不是模型名上，明确模型可替换而职责、任务包格式与验收流程不变。
+- `README.md` 新增“定位：模型无关”“当前能力”“未来扩展方向”三节：
+  - 当前能力逐条列出本版本已实现的部分（角色分工契约、实现 worker、任务包、单写者约束、
+    审查回路、密钥边界、本地校验、打包与 CI）。
+  - 未来扩展方向涵盖可选模型/provider、角色配置、路由策略、评测与成本记录，并逐行标注
+    “当前”状态，说明尚无自动模型路由、多 provider 调度与用量记录。
+  - 明确当前版本仍使用 OpenAI/GPT 系主代理与 DeepSeek V4.1 Flash worker，且这是本版本
+    唯一支持的组合。
+- `README.md` 正文与英文小节移除对具体版本号（GPT-6）的绑定，改为描述“OpenAI/GPT 系主代理”
+  与“DeepSeek V4.1 Flash worker”这一当前实现事实。
+- `.codex-plugin/plugin.json` 的 `description`、`interface.shortDescription` 与
+  `interface.longDescription` 改为模型无关表述，并说明当前版本的实际模型组合与尚未实现的
+  路由/评测能力；`repository` 与 `homepage` 保持指向 canonical 仓库不变。
+- `interface.defaultPrompt` 中“交给 DeepSeek worker”改为“交给实现 worker”，避免默认提示词
+  绑定具体模型。
+- `plugin.json` 版本号提升到 `0.1.3`。
+
+### 说明
+
+- 本次只改动文档与清单，`scripts/`、`skills/`、CI 工作流、许可证与安全策略未变。
+- 当前实现事实保持准确：主代理负责需求/架构/验收/审查，DeepSeek V4.1 Flash worker 负责实现。
+- 仓库、README 与变更记录中都不含密钥、token 或机器私有路径。
+
 ## [0.1.2] - 2026-09-19
 
 ### 新增
@@ -17,7 +45,7 @@
 
 ### 变更
 
-- `README.md` 明确分工表述为“GPT-6 / OpenAI 主代理负责需求、架构、验收标准与最终审查，
+- `README.md` 明确分工表述为“OpenAI 主代理负责需求、架构、验收标准与最终审查，
   DeepSeek V4.1 Flash worker 负责实现与测试修复”，中英文两节保持一致。
 - `README.md` 开源发布与版本发布章节改用真实仓库地址与 `v0.1.2` tag 示例，
   移除了原先需要读者自行替换的 remote 地址与徽章 owner 占位串。
