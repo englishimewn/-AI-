@@ -1,0 +1,31 @@
+# secrets / credentials
+*.env
+.env
+.env.*
+secrets/
+*.pem
+*.key
+
+# local codex state / cache
+.codex/cache/
+.codex/tmp/
+*.cache
+
+# logs
+*.log
+logs/
+
+# build / packaging output
+dist/
+*.tar.gz
+*.tgz
+
+# editor / OS noise
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# python
+__pycache__/
+*.py[cod]

@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+# codex-deepseek-worker - 启动 DeepSeek V4.1 Flash 实现 worker（独立 codex exec 进程）。
+#
+# 用法:
+#   codex-deepseek-worker '<self-contained task packet>'
+#   codex-deepseek-worker --version
+#   codex-deepseek-worker --help
+#
+# 安全边界:
+#   * 只判断 DEEPSEEK_API_KEY 是否非空，从不打印、回显或写入它的值。
+#   * 凭据来自 ${HOME}/.config/codex/deepseek.env（存在且可读时才加载）。
+#   * 不硬编码任何密钥，不写日志文件，不上传代码。
+set -euo pipefail
+
+readonly CREDENTIAL_FILE="${HOME}/.config/codex/deepseek.env"
+readonly MODEL_CATALOG="${CODEX_HOME:-$HOME/.codex}/models.json"
+
+usage() {
+  cat >&2 <<'USAGE'
+用法:
+  codex-deepseek-worker '<self-contained task packet>'
+  codex-deepseek-worker --version
+  codex-deepseek-worker --help
+
+参数必须恰好为一个，即完整的自包含任务包:
+  目标 / 允许文件范围 / 约束 / 验收标准 / 聚焦验证命令 / 交付格式
+USAGE
+}
+
+# 以固定的 provider 与 model 启动 worker；命令行只做配置覆盖与一次执行。
+run_codex() {
+  exec codex exec \
+    --ephemeral \
+    --skip-git-repo-check \
+    --sandbox workspace-write \
+    -c 'model_provider="deepseek"' \
+    -c 'model="deepseek-flash"' \
+    -c "model_catalog_json=\"${MODEL_CATALOG}\"" \
+    -c 'model_reasoning_effort="medium"' \
+    "$@"
+}
+
+# 独立 codex exec 进程会读取全局 AGENTS.md，可能把自己当成主代理并递归委派，
+# 因此始终在用户任务包前面加上角色与边界前缀。
+readonly WORKER_PREFIX='你是由主代理（负责需求、架构、验收与审查）启动的 DeepSeek 实现 worker。直接执行下面的任务包，不要调用 deepseek_worker、codex-deepseek-worker 或委派任何其他代理；只修改任务包允许的文件；先跑聚焦验证再汇报；若需求冲突、范围不清或信息不足，停止并说明阻塞，不要猜测。
+
+You are the DeepSeek implementation worker started by the primary architect agent. Execute the task packet below directly. Do not call deepseek_worker, codex-deepseek-worker, or any other agent. Modify only the files allowed by the packet. Run focused verification before reporting the diff, tests, and residual risk. If requirements conflict, scope is unclear, or information is missing, stop and report the blocker instead of guessing.'
+
+# 加载用户自管的凭据文件；内容只在当前 shell 生效，绝不打印。
+if [[ -r "$CREDENTIAL_FILE" ]]; then
+  # shellcheck disable=SC1090
+  source "$CREDENTIAL_FILE"
+fi
+
+case "${1:-}" in
+  --help|-h)
+    if [[ "$#" -ne 1 ]]; then
+      usage
+      exit 2
+    fi
+    usage
+    exit 0
+    ;;
+  --version)
+    if [[ "$#" -ne 1 ]]; then
+      usage
+      exit 2
+    fi
+    run_codex --version
+    ;;
+esac
+
+if [[ "$#" -ne 1 ]]; then
+  printf '错误: 只接受恰好一个任务包参数，收到 %s 个参数。\n' "$#" >&2
+  usage
+  exit 2
+fi
+
+if [[ -z "${DEEPSEEK_API_KEY:-}" ]]; then
+  printf '错误: 未检测到非空的 DEEPSEEK_API_KEY，DeepSeek worker 无法启动。\n' >&2
+  printf '本脚本只检查该变量是否为空，不会读取或显示密钥内容。\n' >&2
+  printf '请在本地配置（不要把密钥粘贴到聊天、issue 或仓库里）:\n' >&2
+  printf '  1) mkdir -p ~/.config/codex\n' >&2
+  printf '  2) 在 %s 写入一行: DEEPSEEK_API_KEY=本地密钥值\n' "$CREDENTIAL_FILE" >&2
+  printf '  3) chmod 600 %s\n' "$CREDENTIAL_FILE" >&2
+  printf '  4) 重新运行 codex-deepseek-worker --version 确认启动器可用。\n' >&2
+  exit 1
+fi
+
+readonly TASK_PACKET="$1"
+
+run_codex "${WORKER_PREFIX}
+
+${TASK_PACKET}"

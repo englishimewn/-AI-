@@ -1,0 +1,38 @@
+{
+  "name": "dual-model-coding",
+  "version": "0.1.2",
+  "description": "Two-model coding workflow for Codex: the primary OpenAI model owns requirements, architecture, acceptance criteria, and review, while a DeepSeek V4.1 Flash worker implements scoped code changes and focused test fixes locally.",
+  "author": {
+    "name": "dual-model-coding contributors"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/englishimewn/-AI-",
+  "homepage": "https://github.com/englishimewn/-AI-",
+  "keywords": [
+    "codex",
+    "plugin",
+    "skill",
+    "dual-model",
+    "deepseek",
+    "delegation",
+    "code-review"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Dual Model Coding",
+    "shortDescription": "Primary model plans and reviews; DeepSeek worker implements.",
+    "longDescription": "Packages a two-model coding workflow: the primary OpenAI model owns requirement analysis, architecture, task decomposition, acceptance criteria, risk decisions, and final review, while DeepSeek V4.1 Flash performs scoped implementation and test-fix iterations through the local codex-deepseek-worker launcher. One write-capable worker at a time owns overlapping files. The plugin keeps API keys out of prompts, logs, and the repository, sends no code anywhere except the configured model provider, and stops with explicit setup instructions when the worker or its credential is unavailable.",
+    "developerName": "dual-model-coding contributors",
+    "category": "Productivity",
+    "capabilities": [
+      "Write",
+      "Review",
+      "LocalOnly"
+    ],
+    "defaultPrompt": [
+      "Split this task: primary model plans, worker implements.",
+      "Delegate this scoped change to codex-deepseek-worker.",
+      "Review the worker diff and test results before merging."
+    ]
+  }
+}
